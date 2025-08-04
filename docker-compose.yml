@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+
+  
+  utilisateur:
+    build: .
+    container_name: utilisateur
+    ports:
+      - "8081:8081"  # Port local:port interne
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/utilisateurdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - utilisateur-net
+
+
+  db:
+    image: postgres:15
+    container_name: utilisateur-db
+    environment:
+      POSTGRES_DB: utilisateurdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"  # Accès local à la BDD
+    volumes:
+      - utilisateur-data:/var/lib/postgresql/data
+    networks:
+      - utilisateur-net
+
+  # 🔐 Authentification Keycloak (à activer plus tard)
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:24.0.1
+  #   container_name: utilisateur-keycloak
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     KEYCLOAK_ADMIN: admin
+  #     KEYCLOAK_ADMIN_PASSWORD: admin
+  #   command: start-dev
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - utilisateur-net
+
+
+volumes:
+  utilisateur-data:
+
+
+networks:
+   utilisateur-net:
